@@ -1,0 +1,14 @@
+[package]
+name = "subnet_calculator"
+version = "0.1.0"
+edition = "2021"
+
+[profile.dev]
+opt-level = 0
+debug = true
+incremental = true
+codegen-units = 16
+lto = false
+
+[dependencies]
+iced = { version = "0.12.1", features = ["smol"] }
