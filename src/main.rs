@@ -1,12 +1,13 @@
-use std::net::Ipv4Addr;
 use std::str::FromStr;
 
 use iced::{Application, color, Command, Element, Length, Settings, Theme};
 use iced::widget::{Button, Column, Container, Row, Text, TextInput};
+use crate::ipv4::Ipv4Addr;
 
 use crate::subnet::{Calculator, Subnet};
 
 mod subnet;
+mod ipv4;
 
 struct SubnetCalculator {
     network_address: String,
@@ -65,7 +66,7 @@ impl Application for SubnetCalculator {
                     0
                 });
                 let last_address = match self.last_address {
-                    Some(addr) => addr.into(),
+                    Some(addr) => addr,
                     None => {
                         self.error_message = "Invalid network address".to_string();
                         return Command::none();
@@ -76,7 +77,7 @@ impl Application for SubnetCalculator {
                 }
                 let result = Calculator::generate_subnet(last_address, num_networks);
                 self.result = Some(result.0);
-                self.last_address = Some(result.1.into());
+                self.last_address = Some(result.1);
             }
             Message::Reset => {
                 self.network_address.clear();
