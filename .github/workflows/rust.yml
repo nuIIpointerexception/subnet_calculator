@@ -29,10 +29,6 @@ jobs:
     steps:
     - uses: hecrj/setup-rust-action@v2
     - uses: actions/checkout@v2
-    - name: Enable static CRT linkage
-      run: |
-        echo '[target.x86_64-pc-windows-msvc]' >> .cargo/config
-        echo 'rustflags = ["-Ctarget-feature=+crt-static"]' >> .cargo/config
     - name: Build binary
       run: cargo build --verbose --release
     - name: Archive binary
