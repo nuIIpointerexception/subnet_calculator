@@ -22,33 +22,29 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: project-name-x86_64-unknown-linux-gnu
-        path: target/release/project-name
+        path: target/release/subnet_calculator
     - name: Pack .deb package
       run: cargo deb --no-build
     - name: Rename .deb package
-      run: mv target/debian/*.deb target/debian/project-name-x86_64-debian-linux-gnu.deb
+      run: mv target/debian/*.deb target/debian/subnet_calculator-x86_64-debian-linux-gnu.deb
     - name: Archive .deb package
       uses: actions/upload-artifact@v2
       with:
         name: project-name-x86_64-debian-linux-gnu
-        path: target/debian/project-name-x86_64-debian-linux-gnu.deb
+        path: target/debian/subnet_calculator-x86_64-debian-linux-gnu.deb
 
   build_windows:
     runs-on: windows-latest
     steps:
     - uses: hecrj/setup-rust-action@v2
     - uses: actions/checkout@v2
-    - name: Enable static CRT linkage
-      run: |
-        echo '[target.x86_64-pc-windows-msvc]' >> .cargo/config
-        echo 'rustflags = ["-Ctarget-feature=+crt-static"]' >> .cargo/config
     - name: Build binary
       run: cargo build --verbose --release
     - name: Archive binary
       uses: actions/upload-artifact@v2
       with:
-        name: project-name-x86_64-pc-windows-msvc
-        path: target/release/project-name.exe
+        name: subnet_calculator-x86_64-pc-windows-msvc
+        path: target/release/subnet_calculator.exe
 
   build_macos:
     runs-on: macOS-latest
@@ -60,9 +56,9 @@ jobs:
         MACOSX_DEPLOYMENT_TARGET: 10.14
       run: cargo build --verbose --release
     - name: Make binary executable
-      run: chmod +x target/release/project-name
+      run: chmod +x target/release/subnet_calculator
     - name: Archive binary
       uses: actions/upload-artifact@v2
       with:
-        name: project-name-x86_64-apple-darwin
-        path: target/release/project-name
+        name: subnet_calculator-x86_64-apple-darwin
+        path: target/release/subnet_calculator
