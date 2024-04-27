@@ -1,4 +1,4 @@
-name: Build and Release
+name: Build
 on:
   push:
     branches:
@@ -11,37 +11,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: hecrj/setup-rust-action@v2
-    - name: Install cargo-deb
-      run: cargo install cargo-deb
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        export DEBIAN_FRONTED=noninteractive
-        sudo apt-get -qq update
+        sudo apt-get update
         sudo apt-get install -y libxkbcommon-dev
     - name: Build binary
       run: cargo build --verbose --release
-    - name: Pack .deb package
-      run: cargo deb --no-build
-    - name: Create GitHub Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Archive binary
+      uses: actions/upload-artifact@v2
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-    - name: Upload .deb package
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./target/debian/subnet_calculator-x86_64-debian-linux-gnu.deb
-        asset_name: subnet_calculator-x86_64-debian-linux-gnu.deb
-        asset_content_type: application/octet-stream
+        name: subnet_calculator-x86_64-unknown-linux-gnu
+        path: target/release/subnet_calculator
 
   build_windows:
     runs-on: windows-latest
@@ -54,15 +35,11 @@ jobs:
         echo 'rustflags = ["-Ctarget-feature=+crt-static"]' >> .cargo/config
     - name: Build binary
       run: cargo build --verbose --release
-    - name: Upload Windows executable
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Archive binary
+      uses: actions/upload-artifact@v2
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./target/release/subnet_calculator.exe
-        asset_name: subnet_calculator-x86_64-pc-windows-msvc.exe
-        asset_content_type: application/octet-stream
+        name: subnet_calculator-x86_64-pc-windows-msvc
+        path: target/release/subnet_calculator.exe
 
   build_macos:
     runs-on: macOS-latest
@@ -75,12 +52,8 @@ jobs:
       run: cargo build --verbose --release
     - name: Make binary executable
       run: chmod +x target/release/subnet_calculator
-    - name: Upload macOS binary
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Archive binary
+      uses: actions/upload-artifact@v2
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./target/release/subnet_calculator
-        asset_name: subnet_calculator-x86_64-apple-darwin
-        asset_content_type: application/octet-stream
+        name: subnet_calculator-x86_64-apple-darwin
+        path: target/release/subnet_calculator
