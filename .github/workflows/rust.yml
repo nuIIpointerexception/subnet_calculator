@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
 
 jobs:
   build_linux:
@@ -53,46 +51,3 @@ jobs:
         with:
           name: subnet_calculator-x86_64-apple-darwin
           path: target/release/subnet_calculator
-
-  release:
-    needs: [build_linux, build_windows, build_macos]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v2
-      - name: Create release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-      - name: Upload Linux binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./subnet_calculator-x86_64-unknown-linux-gnu/subnet_calculator
-          asset_name: subnet_calculator-linux-x86_64
-          asset_content_type: application/octet-stream
-      - name: Upload Windows binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./subnet_calculator-x86_64-pc-windows-msvc/subnet_calculator.exe
-          asset_name: subnet_calculator-windows-x86_64.exe
-          asset_content_type: application/octet-stream
-      - name: Upload macOS binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./subnet_calculator-x86_64-apple-darwin/subnet_calculator
-          asset_name: subnet_calculator-macos-x86_64
-          asset_content_type: application/octet-stream

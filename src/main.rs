@@ -11,7 +11,7 @@ mod ipv4;
 
 struct SubnetCalculator {
     network_address: String,
-    num_networks: String,
+    num_hosts: String,
     last_address: Option<Ipv4Addr>,
     result: Option<Subnet>,
     error_message: String,
@@ -20,7 +20,7 @@ struct SubnetCalculator {
 #[derive(Debug, Clone)]
 enum Message {
     NetworkAddressChanged(String),
-    NumNetworksChanged(String),
+    NumHostsChanged(String),
     Calculate,
     Reset,
 }
@@ -32,14 +32,14 @@ impl Application for SubnetCalculator {
     type Flags = ();
 
     fn theme(&self) -> Theme {
-        Theme::Nord.to_owned()
+        Theme::Dark.to_owned()
     }
 
     fn new(_flags: ()) -> (SubnetCalculator, Command<Message>) {
         (
             SubnetCalculator {
                 network_address: String::new(),
-                num_networks: String::new(),
+                num_hosts: String::new(),
                 last_address: None,
                 result: None,
                 error_message: String::new(),
@@ -58,11 +58,11 @@ impl Application for SubnetCalculator {
                 self.network_address = network_address;
                 self.last_address = Ipv4Addr::from_str(&self.network_address).ok();
             }
-            Message::NumNetworksChanged(num_networks) => self.num_networks = num_networks,
+            Message::NumHostsChanged(num_hosts) => self.num_hosts = num_hosts,
             Message::Calculate => {
                 self.error_message.clear();
-                let num_networks = self.num_networks.parse::<u32>().unwrap_or_else(|_| {
-                    self.error_message = "Invalid number of networks".to_string();
+                let num_hosts = self.num_hosts.parse::<u32>().unwrap_or_else(|_| {
+                    self.error_message = "Invalid number of hosts".to_string();
                     0
                 });
                 let last_address = match self.last_address {
@@ -75,13 +75,13 @@ impl Application for SubnetCalculator {
                 if !self.error_message.is_empty() {
                     return Command::none();
                 }
-                let result = Calculator::generate_subnet(last_address, num_networks);
+                let result = Calculator::generate_subnet(last_address, num_hosts);
                 self.result = Some(result.0);
                 self.last_address = Some(result.1);
             }
             Message::Reset => {
                 self.network_address.clear();
-                self.num_networks.clear();
+                self.num_hosts.clear();
                 self.last_address = None;
                 self.result = None;
                 self.error_message.clear();
@@ -99,8 +99,8 @@ impl Application for SubnetCalculator {
             .on_input(Message::NetworkAddressChanged)
             .padding(10);
 
-        let num_networks_input = TextInput::new("Number of Networks", &self.num_networks)
-            .on_input(Message::NumNetworksChanged)
+        let num_hosts_input = TextInput::new("Number of Hosts", &self.num_hosts)
+            .on_input(Message::NumHostsChanged)
             .padding(10);
 
         let button_row = Row::new()
@@ -143,7 +143,7 @@ impl Application for SubnetCalculator {
         let content = Column::new()
             .push(title)
             .push(network_address_input)
-            .push(num_networks_input)
+            .push(num_hosts_input)
             .push(button_row)
             .push(result_text)
             .spacing(20)

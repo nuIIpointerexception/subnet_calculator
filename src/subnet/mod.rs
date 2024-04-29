@@ -37,7 +37,6 @@ use crate::ipv4::Ipv4Addr;
 /// and the number of required hosts for each subnet.
 pub struct Calculator;
 
-
 /// Represents a subnet with its address, mask length, usable range, broadcast address, and number of hosts.
 pub struct Subnet {
     pub address: Ipv4Addr,
@@ -88,7 +87,8 @@ impl Calculator {
     pub fn generate_subnet(last_address: Ipv4Addr, num_hosts: u32) -> (Subnet, Ipv4Addr) {
         let network_address = last_address;
         let required_subnet_mask_length = Self::calc_length(num_hosts);
-        let subnet = Self::generate_subnet_from_address(network_address, required_subnet_mask_length);
+        let subnet =
+            Self::generate_subnet_from_address(network_address, required_subnet_mask_length);
         let next_address = Ipv4Addr::from_u32(subnet.broadcast.to_u32() + 1);
         (subnet, next_address)
     }
