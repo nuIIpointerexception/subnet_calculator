@@ -38,6 +38,7 @@ use crate::ipv4::Ipv4Addr;
 pub struct Calculator;
 
 /// Represents a subnet with its address, mask length, usable range, broadcast address, and number of hosts.
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Subnet {
     pub address: Ipv4Addr,
     pub mask_length: u32,
